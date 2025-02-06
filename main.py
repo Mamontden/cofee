@@ -1,14 +1,24 @@
 import sqlite3
 import sys
-from PyQt6 import uic
+import os
 from PyQt6.QtWidgets import QApplication, QDialog, QMessageBox
 from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem
+from UI.main_ui import Ui_MainWindow
+from UI.add_edit_coffee_form_ui import Ui_Dialog
 
-class MyWidget(QMainWindow):
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("main.ui", self)
-        self.con = sqlite3.connect("coffee.sqlite")
+        self.setupUi(self)
+        self.con = sqlite3.connect(resource_path('data/coffee.sqlite'))
         self.cur = self.con.cursor()
         self.create_table()
         self.load_coffee_data()
@@ -76,10 +86,10 @@ class MyWidget(QMainWindow):
         self.con.close()
         event.accept()
 
-class AddEditCoffeeDialog(QDialog):
+class AddEditCoffeeDialog(QDialog, Ui_Dialog):
     def __init__(self, db_connection, coffee_data=None):
         super().__init__()
-        uic.loadUi("addEditCoffeeForm.ui", self)
+        self.setupUi(self)
         self.con = db_connection
         self.cur = self.con.cursor()
         self.coffee_data = coffee_data
